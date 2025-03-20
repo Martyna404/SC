@@ -3,16 +3,14 @@
 
 // Funkcja globalna
 void funkcjaGlobalna(std::string tekst) {
-    std::cout << "Global function.ID: " << std::this_thread::get_id()
-        << " Message: " << tekst << std::endl;
+    std::cout << "[Global Function] Message: " << tekst << std::endl;
 }
 
-// Function object
+// Obiekt funkcyjny (funktor)
 class Funktor {
 public:
     void operator()(std::string tekst) {
-        std::cout << "function object. ID: " << std::this_thread::get_id()
-            << " Message: " << tekst << std::endl;
+        std::cout << "[Function Object] Message: " << tekst << std::endl;
     }
 };
 
@@ -20,24 +18,22 @@ public:
 class Klasa {
 public:
     void metodaKlasy(std::string tekst) {
-        std::cout << " Class method ID: " << std::this_thread::get_id()
-            << " Message " << tekst << std::endl;
+        std::cout << "[Class Method] Message: " << tekst << std::endl;
     }
 };
 
 int main() {
-    std::thread watek1(funkcjaGlobalna, "global function");
+    std::thread watek1(funkcjaGlobalna, "Hello from Global Function");
 
     Funktor funktor;
-    std::thread watek2(funktor, "function object");
+    std::thread watek2(funktor, "Hello from Function Object");
 
     Klasa obiekt;
-    std::thread watek3(&Klasa::metodaKlasy, &obiekt, "klasy");
+    std::thread watek3(&Klasa::metodaKlasy, &obiekt, "Hello from Class Method");
 
     std::thread watek4([](std::string tekst) {
-        std::cout << "lambda function. ID : " << std::this_thread::get_id()
-            << " Message: " << tekst << std::endl;
-        }, "lambda");
+        std::cout << "[Lambda Function] Message: " << tekst << std::endl;
+        }, "Hello from Lambda Function");
 
     watek1.join();
     watek2.join();
