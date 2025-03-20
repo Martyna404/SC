@@ -1,1 +1,50 @@
+#include <iostream>
+#include <thread>
+
+// Funkcja globalna
+void funkcjaGlobalna(std::string tekst) {
+    std::cout << "Global function.ID: " << std::this_thread::get_id()
+        << " Message: " << tekst << std::endl;
+}
+
+// Function object
+class Funktor {
+public:
+    void operator()(std::string tekst) {
+        std::cout << "function object. ID: " << std::this_thread::get_id()
+            << " Message: " << tekst << std::endl;
+    }
+};
+
+// Klasa z metodą
+class Klasa {
+public:
+    void metodaKlasy(std::string tekst) {
+        std::cout << " Class method ID: " << std::this_thread::get_id()
+            << " Message " << tekst << std::endl;
+    }
+};
+
+int main() {
+    std::thread watek1(funkcjaGlobalna, "global function");
+
+    Funktor funktor;
+    std::thread watek2(funktor, "function object");
+
+    Klasa obiekt;
+    std::thread watek3(&Klasa::metodaKlasy, &obiekt, "klasy");
+
+    std::thread watek4([](std::string tekst) {
+        std::cout << "lambda function. ID : " << std::this_thread::get_id()
+            << " Message: " << tekst << std::endl;
+        }, "lambda");
+
+    watek1.join();
+    watek2.join();
+    watek3.join();
+    watek4.join();
+
+    return 0;
+}
+
 
