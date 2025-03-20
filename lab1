@@ -1,29 +1,24 @@
 #include <iostream>
 #include <thread>
 
-// Funkcja globalna
-void funkcjaGlobalna(std::string tekst) {
-    std::cout << "[Global Function] Message: " << tekst << std::endl;
-}
-
-// Obiekt funkcyjny (funktor)
-class Funktor {
-public:
+// Funktor jako struct (domyślnie public)
+struct Funktor {
     void operator()(std::string tekst) {
         std::cout << "[Function Object] Message: " << tekst << std::endl;
     }
 };
 
-// Klasa z metodą
-class Klasa {
-public:
+// Klasa jako struct
+struct Klasa {
     void metodaKlasy(std::string tekst) {
         std::cout << "[Class Method] Message: " << tekst << std::endl;
     }
 };
 
 int main() {
-    std::thread watek1(funkcjaGlobalna, "Hello from Global Function");
+    std::thread watek1([](std::string tekst) {
+        std::cout << "[Global Function] Message: " << tekst << std::endl;
+        }, "Hello from Global Function");
 
     Funktor funktor;
     std::thread watek2(funktor, "Hello from Function Object");
@@ -42,5 +37,4 @@ int main() {
 
     return 0;
 }
-
 
