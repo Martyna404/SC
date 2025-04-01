@@ -74,4 +74,109 @@ int main() {
 
     return 0;
 }
+//TASK3
+#include <iostream>
+#include <thread>
+#include <vector>
+#include <mutex>
+#include <atomic>
+#include <chrono>
+
+const int INCREMENTS = 10000000;
+const int THREAD_COUNT = 10;
+
+// Global variables
+int counter_unsynchronized = 0;
+int counter_with_mutex = 0;
+std::atomic<int> counter_with_atomic(0);
+std::mutex mtx;
+
+
+// Unsynchronized 
+void increment_unsynchronized() {
+    for (int i = 0; i < INCREMENTS; i++) {
+        counter_unsynchronized++;
+    }
+}
+
+// mutex
+void increment_with_mutex() {
+    for (int i = 0; i < INCREMENTS; i++) {
+        mtx.lock();
+        counter_with_mutex++;
+        mtx.unlock();
+    }
+}
+
+// atomic
+void increment_with_atomic() {
+    for (int i = 0; i < INCREMENTS; i++) {
+        counter_with_atomic++;
+    }
+}
+
+int main() {
+    //unsynchronized
+    counter_unsynchronized = 0;
+    std::vector<std::thread> threads1;
+
+    auto start1 = std::chrono::high_resolution_clock::now();
+
+    for (int i = 0; i < THREAD_COUNT; i++) {
+        threads1.push_back(std::thread(increment_unsynchronized));
+    }
+
+    for (int i = 0; i < THREAD_COUNT; i++) {
+        threads1[i].join();
+    }
+
+    auto end1 = std::chrono::high_resolution_clock::now();
+    auto time1 = std::chrono::duration_cast<std::chrono::milliseconds>(end1 - start1);
+
+    std::cout << "Unsynchronized " << counter_unsynchronized
+        << ", Time: " << time1.count() << " ms\n\n";
+
+    // mutex
+    counter_with_mutex = 0;
+    std::vector<std::thread> threads2;
+
+    auto start2 = std::chrono::high_resolution_clock::now();
+
+    for (int i = 0; i < THREAD_COUNT; i++) {
+        threads2.push_back(std::thread(increment_with_mutex));
+    }
+
+    for (int i = 0; i < THREAD_COUNT; i++) {
+        threads2[i].join();
+    }
+
+    auto end2 = std::chrono::high_resolution_clock::now();
+    auto time2 = std::chrono::duration_cast<std::chrono::milliseconds>(end2 - start2);
+
+    std::cout << "mutex = " << counter_with_mutex
+        << ", Time: " << time2.count() << " ms\n\n";
+
+    // With atomic 
+    counter_with_atomic = 0;
+    std::vector<std::thread> threads3;
+
+    auto start3 = std::chrono::high_resolution_clock::now();
+
+    for (int i = 0; i < THREAD_COUNT; i++) {
+        threads3.push_back(std::thread(increment_with_atomic));
+    }
+
+    for (int i = 0; i < THREAD_COUNT; i++) {
+        threads3[i].join();
+    }
+
+    auto end3 = std::chrono::high_resolution_clock::now();
+    auto time3 = std::chrono::duration_cast<std::chrono::milliseconds>(end3 - start3);
+
+    std::cout << "atomic = " << counter_with_atomic
+        << ", Time: " << time3.count() << " ms\n";
+
+    return 0;
+}
+
 
