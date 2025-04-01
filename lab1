@@ -1,52 +1,77 @@
+// TASK1
 #include <iostream>
 #include <thread>
 
-// Global function
-void globalFunction(std::string text) {
-    std::cout << "Global Function Message: " << text << std::endl;
-}
-
-// Function object
-class FunctionObject {
-public:
-    void operator()(std::string text) {
-        std::cout << "Function Object Message: " << text << std::endl;
+// Funktor jako struct (domyślnie public)
+struct Funktor {
+    void operator()(std::string tekst) {
+        std::cout << "[Function Object] Message: " << tekst << std::endl;
     }
 };
 
-// Class with a method
-class MyClass {
-public:
-    void classMethod(std::string text) {
-        std::cout << "Class Method Message: " << text << std::endl;
+// Klasa jako struct
+struct Klasa {
+    void metodaKlasy(std::string tekst) {
+        std::cout << "[Class Method] Message: " << tekst << std::endl;
     }
 };
 
 int main() {
-    // Thread with global function
-    std::thread t1(globalFunction, "Hello from global function");
+    std::thread watek1([](std::string tekst) {
+        std::cout << "[Global Function] Message: " << tekst << std::endl;
+        }, "Hello from Global Function");
 
-    // Thread with function object
-    FunctionObject funcObj;
-    std::thread t2(funcObj, "Hello from function object");
+    Funktor funktor;
+    std::thread watek2(funktor, "Hello from Function Object");
 
-    // Thread with class method
-    MyClass obj;
-    std::thread t3(&MyClass::classMethod, &obj, "Hello from class method");
+    Klasa obiekt;
+    std::thread watek3(&Klasa::metodaKlasy, &obiekt, "Hello from Class Method");
 
-    // Thread with lambda function
-    std::thread t4([](std::string text) {
-        std::cout << "Lambda Function Message: " << text << std::endl;
-        }, "Hello from lambda function");
+    std::thread watek4([](std::string tekst) {
+        std::cout << "[Lambda Function] Message: " << tekst << std::endl;
+        }, "Hello from Lambda Function");
 
-    // Wait for all threads to finish
-    t1.join();
-    t2.join();
-    t3.join();
-    t4.join();
+    watek1.join();
+    watek2.join();
+    watek3.join();
+    watek4.join();
 
     return 0;
 }
 
+// TASK2
 
+#include <iostream>
+#include <thread>
+#include <mutex>
+#include <vector>
+#include <sstream>  
+
+std::mutex mtx;
+
+// Global function -50 times
+void printMessage(std::string text) {
+    for (int i = 0; i < 50; i++) {
+        std::lock_guard<std::mutex> lock(mtx);
+        std::cout << text << " - Line " << i + 1 << std::endl;
+    }
+}
+
+int main() {
+    std::vector<std::thread> threads;
+
+    for (int i = 1; i <= 20; ++i) {
+        std::stringstream ss;
+        ss << "Thread #" << i;
+        std::string threadText = ss.str();
+
+        threads.emplace_back(printMessage, threadText);
+    }
+
+    for (auto& t : threads) {
+        t.join();
+    }
+
+    return 0;
+}
 
