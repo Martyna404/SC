@@ -1,0 +1,6 @@
+Multiplier,Queue capacity,Arrays,Consumer threads,Avg time per consumer,Avg time per element,Execution time
+1,16,128,2,2.48771,0.0388705,162
+2,32,256,4,5.10943,0.0798348,318
+3,48,384,6,7.00574,0.109465,455
+4,64,512,8,13.6282,0.21294,863
+5,80,640,10,21.696,0.339,1331
